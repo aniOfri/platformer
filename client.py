@@ -1,6 +1,6 @@
 import pygame
-import random
 from platformer import Platformer
+from network import Network
 pygame.font.init()
 
 width = 500
@@ -11,7 +11,12 @@ pygame.display.set_caption("Platformer")
 
 def main():
     run = True
+    n = Network("localhost")
+    player = int(n.get())
     clock = pygame.time.Clock()
+    pygame.display.set_caption("Hippel! | Player " + str(player + 1))
+    print("You are player number ", player)
+
     pfmr = Platformer(width/2, height-100, win)
     while run:
         clock.tick(60)
@@ -20,7 +25,6 @@ def main():
                 run = False
                 pygame.quit()
 
-        pfmr.collide()
         pfmr.update()
         pfmr.move()
         pfmr.draw()

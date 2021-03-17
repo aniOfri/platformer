@@ -91,7 +91,7 @@ class Platformer:
 
         if collision != -1 and self.vel >= 0:
             if keys[pygame.K_UP]:
-                self.acceleration -= 8 + self.air_time
+                self.acceleration -= 10 + self.air_time
                 if self.y < 0:
                     self.y = 0
             else:
