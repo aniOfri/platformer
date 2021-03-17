@@ -1,2 +1,3 @@
-# platformer
-platformer comp in python3
+# Platformer Race
+
+Platformer race in python using sockets
