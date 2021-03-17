@@ -22,6 +22,8 @@ class Platformer:
         self.acceleration = 0
         self.air_time = 0
         self.air_time_color = (255, 255, 255)
+        self.score = 0
+        self.last_collision = -1
 
         self.platforms = []
 
@@ -35,7 +37,7 @@ class Platformer:
             y += random.randint(75, 100)
 
         self.platforms = [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
-        self.platforms.append(pygame.Rect(0, height-52, width, 50))
+        self.platforms.append(pygame.Rect(0, height-50, width, 50))
 
     def update(self):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -49,14 +51,14 @@ class Platformer:
         pygame.draw.rect(self.surface, (255, 0, 0), self.rect)
 
         font = pygame.font.SysFont("Tahoma", 20, False, False)
-        text_object = font.render("Air-Time: "+str(round(self.air_time, 4)), True, self.air_time_color)
-        self.surface.blit(text_object, (20, 10))
+        text_object1 = font.render("Air-Time: "+str(round(self.air_time, 4)), True, self.air_time_color)
+        text_object2 = font.render("Score: "+str(self.score), True, (255, 255, 255))
+        self.surface.blit(text_object1, (20, 10))
+        self.surface.blit(text_object2, (20, 35))
 
         pygame.display.update()
 
-    def collide(self):
-        x, y, rect_width, rect_height = self.rect
-        rect = pygame.Rect(x, y+(rect_height - 1), rect_width, 1)
+    def collide(self, rect):
         collision = rect.collidelist(self.platforms)
 
         if collision == -1:
@@ -65,6 +67,7 @@ class Platformer:
                 rect = pygame.Rect(x, y+i+(rect_height-1), rect_width, 1)
                 collision = rect.collidelist(self.platforms)
                 if collision != -1:
+                    self.y -= i
                     break
 
         return collision
@@ -87,7 +90,10 @@ class Platformer:
             self.draw()
 
         keys = pygame.key.get_pressed()
-        collision = self.collide()
+
+        x, y, rect_width, rect_height = self.rect
+        rect = pygame.Rect(x, y+(rect_height - 1), rect_width, 1)
+        collision = self.collide(rect)
 
         if collision != -1 and self.vel >= 0:
             if keys[pygame.K_UP]:
@@ -105,12 +111,24 @@ class Platformer:
                 elif self.air_time > 5:
                     self.air_time = 5
                     self.air_time_color = (0, 0, 255)
-
         else:
             self.acceleration = 0.2
             if self.vel < 0:
                 self.air_time += 0.01
                 self.air_time_color = (0, 255, 0)
+
+        rect = pygame.Rect(0, self.y, width, 10)
+        score_collision = self.collide(rect)
+        if score_collision == 500:
+            score_collision = 0
+        if score_collision != -1 and score_collision != self.last_collision:
+            if self.last_collision > score_collision:
+                self.score -= abs(self.last_collision-score_collision)
+            elif self.last_collision < score_collision:
+
+                self.score += abs(self.last_collision-score_collision)
+
+            self.last_collision = score_collision
 
         if keys[pygame.K_LEFT]:
             self.x -= 3
