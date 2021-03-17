@@ -20,6 +20,7 @@ def main():
                 run = False
                 pygame.quit()
 
+        pfmr.collide()
         pfmr.update()
         pfmr.move()
         pfmr.draw()
