@@ -1,9 +1,10 @@
 import socket
-from const import *
 from platformer import Platformer
 from _thread import *
 import pickle
 
+width = 500
+height = 700
 
 server = "0.0.0.0"
 port = 5555
@@ -37,8 +38,12 @@ def threaded_client(conn, p, game_id):
 
                 if not data:
                     break
-                # else:
-                #    if data == "reset":
+                else:
+                    if data == "update":
+                        pfmr.update()
+                        print(1)
+                    elif data == "move":
+                        pfmr.move()
 
                 reply = pfmr
                 conn.sendall(pickle.dumps(reply))
@@ -58,8 +63,8 @@ def threaded_client(conn, p, game_id):
 
 
 while True:
-    conn, addr = s.accept()
-    print("Connected to:", addr)
+    conn, address = s.accept()
+    print("Connected to:", address)
 
     count += 1
     p = 0

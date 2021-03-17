@@ -7,11 +7,11 @@ pygame.font.init()
 width = 500
 height = 700
 
-
 class Platformer:
-    def __init__(self, x, y, win):
+    def __init__(self, game_id, x, y):
         self.random_seed = random.randint(0, 100)
-        self.surface = win
+        self.ready = False
+        self.id = game_id
 
         self.x = x
         self.y = y
@@ -42,22 +42,6 @@ class Platformer:
     def update(self):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def draw(self):
-        self.surface.fill((0, 0, 0))
-        global height
-        for plt in self.platforms:
-            pygame.draw.rect(self.surface, (255, 255, 255), plt)
-
-        pygame.draw.rect(self.surface, (255, 0, 0), self.rect)
-
-        font = pygame.font.SysFont("Tahoma", 20, False, False)
-        text_object1 = font.render("Air-Time: "+str(round(self.air_time, 4)), True, self.air_time_color)
-        text_object2 = font.render("Score: "+str(self.score), True, (255, 255, 255))
-        self.surface.blit(text_object1, (20, 10))
-        self.surface.blit(text_object2, (20, 35))
-
-        pygame.display.update()
-
     def collide(self, rect):
         collision = rect.collidelist(self.platforms)
 
@@ -79,15 +63,11 @@ class Platformer:
             self.y += 1
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-            self.draw()
-
         while self.y > height / 2:
             for plt in range(0, len(self.platforms)):
                 self.platforms[plt].y -= 5
             self.y -= 5
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-            self.draw()
 
         keys = pygame.key.get_pressed()
 
