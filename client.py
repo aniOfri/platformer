@@ -14,7 +14,7 @@ def main():
     n = Network("localhost")
     player = int(n.get())
     clock = pygame.time.Clock()
-    pygame.display.set_caption("Hippel! | Player " + str(player + 1))
+    pygame.display.set_caption("Platformer | Player " + str(player + 1))
     print("You are player number ", player)
 
     pfmr = Platformer(width/2, height-100, win)
