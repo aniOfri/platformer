@@ -21,6 +21,7 @@ class Platformer:
         self.vel = 3
         self.acceleration = 0
         self.air_time = 0
+        self.air_time_color = (255, 255, 255)
 
         self.platforms = []
 
@@ -47,8 +48,8 @@ class Platformer:
 
         pygame.draw.rect(self.surface, (255, 0, 0), self.rect)
 
-        font = pygame.font.SysFont("Tahoma", 30, False, False)
-        text_object = font.render("Air-Time: "+str(self.air_time), True, (255, 255, 255))
+        font = pygame.font.SysFont("Tahoma", 20, False, False)
+        text_object = font.render("Air-Time: "+str(round(self.air_time, 4)), True, self.air_time_color)
         self.surface.blit(text_object, (20, 10))
 
         pygame.display.update()
@@ -96,15 +97,20 @@ class Platformer:
             else:
                 self.acceleration = 0
                 self.vel = 0
-                self.air_time -= 0.05
+                self.air_time -= 0.2
+                self.air_time_color = (255, 0, 0)
                 if self.air_time < 0:
                     self.air_time = 0
-                elif self.air_time < 8:
-                    self.air_time = 8
+                    self.air_time_color = (255, 255, 255)
+                elif self.air_time > 5:
+                    self.air_time = 5
+                    self.air_time_color = (0, 0, 255)
 
         else:
-            self.air_time += 0.01
             self.acceleration = 0.2
+            if self.vel < 0:
+                self.air_time += 0.01
+                self.air_time_color = (0, 255, 0)
 
         if keys[pygame.K_LEFT]:
             self.x -= 3
