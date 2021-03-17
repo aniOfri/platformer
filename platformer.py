@@ -4,6 +4,7 @@ import random
 width = 500
 height = 700
 
+
 class Platformer:
     def __init__(self, x, y, win):
         self.random_seed = random.randint(0, 100)
