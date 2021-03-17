@@ -1,2 +1,2 @@
 # platformer
-platformer comp in python
+platformer comp in python3
