@@ -1,23 +1,37 @@
 import pygame
+import random
 
 width = 500
 height = 700
 
-
 class Platformer:
     def __init__(self, x, y, win):
+        self.random_seed = random.randint(0, 100)
         self.surface = win
+
         self.x = x
         self.y = y
-        self.offset_y = 0
         self.width = 20
         self.height = 20
-        self.platforms = []
         self.rect = pygame.Rect(x, y, self.width, self.height)
         self.vel = 3
         self.acceleration = 0
 
+        self.platforms = []
+
     def update(self):
+        random.seed(self.random_seed)
+        platforms = [random.randint(100, int(width/2)) for _ in range(0, 500)]
+        y = 100
+        for j, w in enumerate(platforms):
+            x = random.randint(20, width-w-20)
+            platforms[j] = (platforms[j], [x, y])
+
+            y += random.randint(50, 100)
+
+        self.platforms = [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 5) for plt in platforms]
+        self.platforms.append(pygame.Rect(0, height-5, width, 5))
+
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self):
