@@ -2,6 +2,8 @@ import pygame
 import random
 import numpy
 
+pygame.font.init()
+
 width = 500
 height = 700
 
@@ -18,6 +20,7 @@ class Platformer:
         self.rect = pygame.Rect(x, y, self.width, self.height)
         self.vel = 3
         self.acceleration = 0
+        self.air_time = 0
 
         self.platforms = []
 
@@ -43,6 +46,11 @@ class Platformer:
             pygame.draw.rect(self.surface, (255, 255, 255), plt)
 
         pygame.draw.rect(self.surface, (255, 0, 0), self.rect)
+
+        font = pygame.font.SysFont("Tahoma", 30, False, False)
+        text_object = font.render("Air-Time: "+str(self.air_time), True, (255, 255, 255))
+        self.surface.blit(text_object, (20, 10))
+
         pygame.display.update()
 
     def collide(self):
@@ -88,11 +96,14 @@ class Platformer:
             else:
                 self.acceleration = 0
                 self.vel = 0
-                self.air_time -= 0.1
+                self.air_time -= 0.05
                 if self.air_time < 0:
                     self.air_time = 0
+                elif self.air_time < 8:
+                    self.air_time = 8
 
         else:
+            self.air_time += 0.01
             self.acceleration = 0.2
 
         if keys[pygame.K_LEFT]:
