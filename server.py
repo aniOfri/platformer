@@ -49,6 +49,8 @@ def threaded_client(conn, p, game_id):
                         pfmr.dir[p][x] = False
                     elif data == "move":
                         pfmr.move(p)
+                    elif data == "started":
+                        pfmr.started = True
 
                 reply = pfmr
                 conn.sendall(pickle.dumps(reply))

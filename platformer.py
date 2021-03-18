@@ -12,10 +12,11 @@ class Platformer:
     def __init__(self, game_id):
         self.random_seed = random.randint(0, 100)
         self.ready = False
+        self.started = False
         self.id = game_id
 
-        self.dir = [[False, False, False],
-                    [False, False, False]]
+        self.dir = [[False, False, False, False],
+                    [False, False, False, False]]
         self.x = [width/2, width/2]
         self.y = [height-100, height-100]
         self.width = 20
@@ -35,7 +36,7 @@ class Platformer:
         self.platforms = [[], []]
 
         random.seed(self.random_seed)
-        platforms = [random.randint(100, int(width/2)) for _ in range(0, 50)]
+        platforms = [random.randint(100, int(width/2)) for _ in range(0, 20)]
         y = 100
         for j, w in enumerate(platforms):
             x = random.randint(20, width-w-20)
@@ -71,27 +72,15 @@ class Platformer:
         return collision
 
     def move(self, p):
-        """        while self.y[p] < height / 2 - 50:
-            for plt in range(0, len(self.platforms[p])):
-                self.platforms[p][plt].y += 1
-            self.y[p] += 1
-            self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
-
-        while self.y[p] > height / 2 + 50:
-            for plt in range(0, len(self.platforms[p])):
-                if self.platforms[p][20].y > self.y[p]:
-                    self.platforms[p][plt].y -= 5
-            self.y[p] -= 5
-            self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)"""
-
         x, y, rect_width, rect_height = self.rect[p]
         rect = pygame.Rect(x, y+(rect_height - 2), rect_width, 2)
         collision = self.collide(rect, p)
 
         if collision != -1 and self.vel[p] >= 0:
             if self.dir[p][2]:
-                self.acceleration[p] -= 10 + self.air_time[p]
-                if self.y[p] < 0:
+                self.acceleration[p] -= 12 + self.air_time[p]
+
+                if self.y[p]+self.offset[p] < 0:
                     self.y[p] = 0
             else:
                 self.acceleration[p] = 0
@@ -101,14 +90,16 @@ class Platformer:
                 if self.air_time[p] < 0:
                     self.air_time[p] = 0
                     self.air_time_color[p] = (255, 255, 255)
-                elif self.air_time[p] > 5:
-                    self.air_time[p] = 5
-                    self.air_time_color[p] = (0, 0, 255)
+
         else:
-            self.acceleration[p] = 0.2
+            self.acceleration[p] = 0.5
             if self.vel[p] < 0:
                 self.air_time[p] += 0.01
                 self.air_time_color[p] = (0, 255, 0)
+
+        if self.air_time[p] > 5:
+            self.air_time[p] = 5
+            self.air_time_color[p] = (0, 0, 255)
 
         rect = pygame.Rect(0, self.y[p], width, 10)
         score_collision = self.collide(rect, p)
