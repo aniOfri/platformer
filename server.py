@@ -40,7 +40,7 @@ def threaded_client(conn, p, game_id):
                     break
                 else:
                     if data == "update":
-                        pfmr.update(p)
+                        pfmr.update()
                     elif "down" in data:
                         x = int(data[len(data) - 1])
                         pfmr.dir[p][x] = True

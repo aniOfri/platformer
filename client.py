@@ -9,19 +9,35 @@ height = 700
 win = pygame.display.set_mode((width, height))
 
 
+def add_offset(rect, offset):
+    x, y, rect_w, rect_h = rect
+    modified_rect = pygame.Rect(x, y + offset, rect_w, rect_h)
+    return modified_rect
+
+
 def update_window(pfmr, p):
     win.fill((0, 0, 0))
     global height
 
     print(pfmr.offset)
     for plt in pfmr.platforms[p]:
-        x, y, rect_w, rect_h = plt
-        rect = pygame.Rect(x, y + pfmr.offset[p], rect_w, rect_h)
+        rect = add_offset(plt, pfmr.offset[p])
         pygame.draw.rect(win, (255, 255, 255), rect)
 
-    x, y, rect_w, rect_h = pfmr.rect[p]
-    rect = pygame.Rect(x, y + pfmr.offset[p], rect_w, rect_h)
-    pygame.draw.rect(win, (255, 0, 0), rect)
+    if p == 0:
+        rect1 = add_offset(pfmr.rect[0], pfmr.offset[0])
+        pygame.draw.rect(win, (255, 0, 0), rect1)
+
+        if pfmr.ready:
+            rect2 = add_offset(pfmr.rect[1], pfmr.offset[0])
+            pygame.draw.rect(win, (0, 255, 0), rect2)
+    else:
+        rect1 = add_offset(pfmr.rect[0], pfmr.offset[1])
+        pygame.draw.rect(win, (255, 0, 0), rect1)
+
+        if pfmr.ready:
+            rect2 = add_offset(pfmr.rect[1], pfmr.offset[1])
+            pygame.draw.rect(win, (0, 255, 0), rect2)
 
     font = pygame.font.SysFont("Tahoma", 20, False, False)
     text_object1 = font.render("Air-Time: "+str(round(pfmr.air_time[p], 4)), True, pfmr.air_time_color[p])

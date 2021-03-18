@@ -47,14 +47,15 @@ class Platformer:
         self.platforms[0] += [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
         self.platforms[1] += self.platforms[0]
 
-    def update(self, p):
-        while self.y[p]+self.offset[p] < height / 2 - 50:
-            self.offset[p] += 1
+    def update(self):
+        for p in [0, 1]:
+            while self.y[p]+self.offset[p] < height / 2 - 50:
+                self.offset[p] += 1
 
-        while self.y[p]+self.offset[p] > height / 2 + 50:
-            self.offset[p] -= 1
+            while self.y[p]+self.offset[p] > height / 2 + 50:
+                self.offset[p] -= 1
 
-        self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
+            self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
 
     def collide(self, prov_rect, p):
         collision = prov_rect.collidelist(self.platforms[p])
