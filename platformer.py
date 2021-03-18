@@ -28,12 +28,13 @@ class Platformer:
         self.air_time = [0, 0]
         self.air_time_color = [(255, 255, 255), (255, 255, 255)]
         self.score = [0, 0]
+        self.last_score = [0, 0]
         self.last_collision = [-1, -1]
 
         self.platforms = [[], []]
 
         random.seed(self.random_seed)
-        platforms = [random.randint(100, int(width/2)) for _ in range(0, 20)]
+        platforms = [random.randint(100, int(width/2)) for _ in range(0, 50)]
         y = 100
         for j, w in enumerate(platforms):
             x = random.randint(20, width-w-20)
@@ -41,11 +42,24 @@ class Platformer:
 
             y += random.randint(75, 100)
 
-        self.platforms[0] = [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
-        self.platforms[0].append(pygame.Rect(0, height-50, width, 50))
-        self.platforms[1] += self.platforms[0]
+        self.platforms[0].append(pygame.Rect(0, height - 50, width, 50))
+        self.platforms[0] += [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
+        self.platforms[1] = self.platforms[0]
 
     def update(self, p):
+        if self.score[p] > self.last_score[p]:
+            while self.y[p] < height / 2 - 50:
+                for plt in range(0, len(self.platforms[p])):
+                    self.platforms[p][plt].y += 1
+                self.y[p] += 1
+
+        elif self.score[p] < self.last_score[p]:
+            while self.y[p] < height / 2 - 50:
+                for plt in range(0, len(self.platforms[p])):
+                    self.platforms[p][plt].y -= 1
+                self.y[p] += 1
+
+        print(self.score[p], self.last_score[p])
         self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
 
     def collide(self, rect, p):
@@ -54,7 +68,7 @@ class Platformer:
         if collision == -1:
             for i in numpy.arange(0.1, 1, 0.001):
                 x, y, rect_width, rect_height = self.rect[p]
-                rect = pygame.Rect(x, y + i + (rect_height - 1), rect_width, 1)
+                rect = pygame.Rect(x, y + i, rect_width, rect_height)
                 collision = rect.collidelist(self.platforms[p])
                 if collision != -1:
                     break
@@ -62,17 +76,18 @@ class Platformer:
         return collision
 
     def move(self, p):
-        while self.y[p] < height / 2 - 50:
+        """        while self.y[p] < height / 2 - 50:
             for plt in range(0, len(self.platforms[p])):
                 self.platforms[p][plt].y += 1
             self.y[p] += 1
             self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
 
-        while self.y[p] > height / 2:
+        while self.y[p] > height / 2 + 50:
             for plt in range(0, len(self.platforms[p])):
-                self.platforms[p][plt].y -= 5
+                if self.platforms[p][20].y > self.y[p]:
+                    self.platforms[p][plt].y -= 5
             self.y[p] -= 5
-            self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)
+            self.rect[p] = pygame.Rect(self.x[p], self.y[p], self.width, self.height)"""
 
         x, y, rect_width, rect_height = self.rect[p]
         rect = pygame.Rect(x, y+(rect_height - 1), rect_width, 1)
@@ -102,9 +117,11 @@ class Platformer:
 
         rect = pygame.Rect(0, self.y[p], width, 10)
         score_collision = self.collide(rect, p)
-        if score_collision == 500:
+
+        if score_collision == len(self.platforms[p]):
             score_collision = 0
         if score_collision != -1 and score_collision != self.last_collision[p]:
+            self.last_score[p] = self.score[p]
             if self.last_collision[p] > score_collision:
                 self.score[p] -= abs(self.last_collision[p]-score_collision)
             elif self.last_collision[p] < score_collision:

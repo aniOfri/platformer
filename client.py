@@ -16,11 +16,7 @@ def update_window(pfmr, p):
     for plt in pfmr.platforms[p]:
         pygame.draw.rect(win, (255, 255, 255), plt)
 
-    if pfmr.ready:
-        pygame.draw.rect(win, (255, 0, 0), pfmr.rect[0])
-        pygame.draw.rect(win, (255, 0, 0), pfmr.rect[1])
-    else:
-        pygame.draw.rect(win, (255, 0, 0), pfmr.rect[p])
+    pygame.draw.rect(win, (255, 0, 0), pfmr.rect[p])
 
     font = pygame.font.SysFont("Tahoma", 20, False, False)
     text_object1 = font.render("Air-Time: "+str(round(pfmr.air_time[p], 4)), True, pfmr.air_time_color[p])
