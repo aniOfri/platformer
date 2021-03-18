@@ -19,7 +19,6 @@ def update_window(pfmr, p):
     win.fill((0, 0, 0))
     global height
 
-    print(pfmr.offset)
     for plt in pfmr.platforms[p]:
         rect = add_offset(plt, pfmr.offset[p])
         pygame.draw.rect(win, (255, 255, 255), rect)
@@ -60,7 +59,7 @@ def main():
         clock.tick(60)
 
         try:
-            pfmr = n.send("update")
+            n.send("update")
         except socket.error as e:
             print(e)
             print("Couldn't get game..")
@@ -87,8 +86,7 @@ def main():
                 if event.key == pygame.K_UP:
                     n.send("up2")
 
-        if pfmr.ready:
-            pfmr = n.send("move")
+        pfmr = n.send("move")
 
         update_window(pfmr, player)
 
