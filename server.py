@@ -40,10 +40,15 @@ def threaded_client(conn, p, game_id):
                     break
                 else:
                     if data == "update":
-                        pfmr.update()
-                        print(1)
+                        pfmr.update(p)
+                    elif "down" in data:
+                        x = int(data[len(data) - 1])
+                        pfmr.dir[p][x] = True
+                    elif "up" in data:
+                        x = int(data[len(data) - 1])
+                        pfmr.dir[p][x] = False
                     elif data == "move":
-                        pfmr.move()
+                        pfmr.move(p)
 
                 reply = pfmr
                 conn.sendall(pickle.dumps(reply))
@@ -70,7 +75,7 @@ while True:
     p = 0
     game_id = (count - 1) // 2
     if count % 2 == 1:
-        games[game_id] = Platformer(game_id, width/2, height-100)
+        games[game_id] = Platformer(game_id)
         print("Creating a new game...")
     else:
         games[game_id].ready = True
