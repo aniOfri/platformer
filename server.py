@@ -51,6 +51,10 @@ def threaded_client(conn, p, game_id):
                         pfmr.move(p)
                     elif data == "started":
                         pfmr.started = True
+                    elif data == "winner":
+                        pfmr.winner = p
+                    elif data == "reset_game":
+                        pfmr.reset_game()
 
                 reply = pfmr
                 conn.sendall(pickle.dumps(reply))

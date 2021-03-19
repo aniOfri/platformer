@@ -96,14 +96,15 @@ def main():
             break
 
         if pfmr.ready and not pfmr.started:
-            countdown(1)
-            pygame.time.delay(1000)
-            countdown(2)
-            pygame.time.delay(1000)
-            countdown(3)
-            pygame.time.delay(1000)
-            countdown("RUSH")
-            pygame.time.delay(200)
+            if False:
+                countdown(1)
+                pygame.time.delay(1000)
+                countdown(2)
+                pygame.time.delay(1000)
+                countdown(3)
+                pygame.time.delay(1000)
+                countdown("RUSH")
+                pygame.time.delay(200)
 
             pfmr = n.send("started")
 
@@ -119,7 +120,7 @@ def main():
                     pfmr = n.send("down1")
                 if event.key == pygame.K_UP:
                     pfmr = n.send("down2")
-                if event.key == pygame.K_SHIFT:
+                if event.key == pygame.K_LSHIFT:
                     pfmr = n.send("down3")
 
             if event.type == pygame.KEYUP:
@@ -129,13 +130,24 @@ def main():
                     pfmr = n.send("up1")
                 if event.key == pygame.K_UP:
                     pfmr = n.send("up2")
-                if event.key == pygame.K_SHIFT:
+                if event.key == pygame.K_LSHIFT:
                     pfmr = n.send("up3")
 
-        if pfmr.started:
+        if pfmr.started and pfmr.winner == -1:
             pfmr = n.send("move")
-        else:
-            print(pygame.time.get_ticks())
+
+            if pfmr.score[player] == pfmr.goal:
+                pfmr = n.send("winner")
+            elif pfmr.timer >= 5000:
+                if player == 0:
+                    if pfmr.score[0] > pfmr.score[1]:
+                        pfmr = n.send("winner")
+                else:
+                    if pfmr.score[1] > pfmr.score[0]:
+                        pfmr = n.send("winner")
+
+        elif pfmr.winner != -1:
+            pfmr = n.send("reset_game")
 
         update_window(pfmr, player)
 

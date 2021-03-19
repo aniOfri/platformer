@@ -14,6 +14,9 @@ class Platformer:
         self.ready = False
         self.started = False
         self.id = game_id
+        self.timer = 0
+        self.winner = -1
+        self.goal = 35
 
         self.dir = [[False, False, False, False],
                     [False, False, False, False]]
@@ -30,19 +33,18 @@ class Platformer:
         self.air_time = [0, 0]
         self.air_time_color = [(255, 255, 255), (255, 255, 255)]
         self.score = [0, 0]
-        self.last_score = [0, 0]
-        self.last_collision = [-1, -1]
+        self.last_collision = [0, 0]
 
         self.platforms = [[], []]
 
         random.seed(self.random_seed)
-        platforms = [random.randint(100, int(width/2)) for _ in range(0, 20)]
+        platforms = [random.randint(100, int(width/2)) for _ in range(0, self.goal)]
         y = 100
         for j, w in enumerate(platforms):
             x = random.randint(20, width-w-20)
             platforms[j] = (platforms[j], [x, y])
 
-            y += random.randint(75, 100)
+            y += random.randint(50, 75)
 
         self.platforms[0].append(pygame.Rect(0, height - 50, width, 50))
         self.platforms[0] += [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
@@ -72,27 +74,34 @@ class Platformer:
         return collision
 
     def move(self, p):
+        self.timer += 1
+
         x, y, rect_width, rect_height = self.rect[p]
         rect = pygame.Rect(x, y+(rect_height - 2), rect_width, 2)
         collision = self.collide(rect, p)
 
         if collision != -1 and self.vel[p] >= 0:
             if self.dir[p][2]:
-                self.acceleration[p] -= 12 + self.air_time[p]
+                self.acceleration[p] = -(10+self.air_time[p])
 
                 if self.y[p]+self.offset[p] < 0:
                     self.y[p] = 0
             else:
                 self.acceleration[p] = 0
                 self.vel[p] = 0
-                self.air_time[p] -= 0.2
-                self.air_time_color[p] = (255, 0, 0)
+                if not self.dir[p][3]:
+                    self.air_time[p] -= 0.2
+                    self.air_time_color[p] = (255, 0, 0)
+
                 if self.air_time[p] < 0:
                     self.air_time[p] = 0
                     self.air_time_color[p] = (255, 255, 255)
 
         else:
-            self.acceleration[p] = 0.5
+            if self.vel[p] <= 10:
+                self.acceleration[p] = 0.5
+            else:
+                self.vel[p] = 10
             if self.vel[p] < 0:
                 self.air_time[p] += 0.01
                 self.air_time_color[p] = (0, 255, 0)
@@ -101,33 +110,63 @@ class Platformer:
             self.air_time[p] = 5
             self.air_time_color[p] = (0, 0, 255)
 
-        rect = pygame.Rect(0, self.y[p], width, 10)
+        rect = pygame.Rect(0, self.y[p]+10, width, 10)
         score_collision = self.collide(rect, p)
 
-        if score_collision == len(self.platforms[p]):
-            score_collision = 0
-        if score_collision != -1 and score_collision != self.last_collision[p]:
-            self.last_score[0] = self.score[0]
-            if self.last_collision[p] > score_collision:
-                self.score[p] -= abs(self.last_collision[p]-score_collision)
-            elif self.last_collision[p] < score_collision:
-                self.score[p] += abs(self.last_collision[p]-score_collision)
-
+        if score_collision != self.last_collision[p]:
             self.last_collision[p] = score_collision
 
+            if score_collision != -1 and collision != -1 and self.vel[p] <= 0:
+                self.score[p] = score_collision
+            elif score_collision != -1 and self.vel[p] > 0:
+                self.score[p] = score_collision-1
+
         if self.dir[p][1]:
-            self.x[p] -= 3
+            if not self.dir[p][3]:
+                self.x[p] -= 3
 
             if self.x[p] < 0:
                 self.x[p] += width
 
         if self.dir[p][0]:
-            self.x[p] += 3
+            if not self.dir[p][3]:
+                self.x[p] += 3
 
             if self.x[p] > width:
                 self.x[p] -= width
 
+        print(self.vel[1], self.acceleration[1])
         self.vel[p] += self.acceleration[p]
 
         self.y[p] += self.vel[p]
         self.vel[p] *= 0.98
+
+    def reset_game(self):
+        self.random_seed = random.randint(0, 100)
+        self.started = False
+        self.timer = 0
+        self.winner = -1
+
+        self.x = [width/2, width/2]
+        self.y = [height-100, height-100]
+        self.offset = [0, 0]
+
+        self.vel = [3, 3]
+        self.air_time = [0, 0]
+        self.score = [0, 0]
+        self.last_collision = [0, 0]
+
+        self.platforms = [[], []]
+
+        random.seed(self.random_seed)
+        platforms = [random.randint(100, int(width/2)) for _ in range(0, self.goal)]
+        y = 100
+        for j, w in enumerate(platforms):
+            x = random.randint(20, width-w-20)
+            platforms[j] = (platforms[j], [x, y])
+
+            y += random.randint(50, 75)
+
+        self.platforms[0].append(pygame.Rect(0, height - 50, width, 50))
+        self.platforms[0] += [pygame.Rect(plt[1][0], height-(plt[1][1]), plt[0], 8) for plt in platforms]
+        self.platforms[1] += self.platforms[0]
